@@ -20,74 +20,44 @@ int	ft_test_tab_line(char *str, int *i)
 	return (-1);
 }
 
+int	lecture(const int fd, char **tmp)
+{
+	int	ret;
+	char	buff[BUFF_SIZE + 1];
+	int	nb_line;
+	int	i;
+	char	*tamp;
+
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
+	{
+		buff[ret] = '\0';
+		nb_line = ft_test_tab_line(tmp[0], i);
+		if (nb_line >= 0)
+		{
+			tamp = ft_strdup(tmp[0]);
+			free(tmp[0];
+			tmp[0] = ft_strjoin(tamp, buff);
+			free(tamp);
+			return (nb_line)
+		}
+		else
+			tmp[0] = ft_strdup(buff);
+		return (0)
+	}
+	return (-1)
+}
+
 int	get_next_line(const int fd, char **line)
 {
-	static char	*tab_line[255];
-	char	buf[BUFF_SIZE + 1];
-	char	*tmp;
-	int	nb_ligne;
-	int	buff_read;
-	int	i;
-	int flag;
-
-	flag = 0;
-	i = 0;
-	buff_read = 1;
-	if (fd < 0)
-		return (-1);
-	if (tab_line[fd] != NULL)
-		if (tab_line[fd][0] == '\0')
-		{
-			line[0] = NULL;
-			return (0);
-		}
-	nb_ligne = ft_test_tab_line(tab_line[fd], &i);
-	while ((nb_ligne <= 0 && buff_read != 0) || flag == 0)
+	static char	*tab[255];
+	int		retour;
+	int		nb_line;
+	
+	while ((retour = lecture(fd, &tab[fb])) == 0)
 	{
-		if (nb_ligne <= 0)
-		{
-			while ((buff_read = read(fd, buf, BUFF_SIZE)) > 0 && nb_ligne <= 0)
-			{
-				buf[buff_read] = '\0';
-				if ((nb_ligne = ft_test_tab_line(tab_line[fd], &i)) == -1)
-					tab_line[fd] = ft_strdup(buf);
-				else if (nb_ligne == 0)
-				{
-					tmp = ft_strjoin(tab_line[fd], buf);
-					free(tab_line[fd]);
-					tab_line[fd] = ft_strdup(tmp);
-				}
-				if ((nb_ligne = ft_test_tab_line(tab_line[fd], &i)) > 0)
-					break;
-			}
-		}
-		if (buff_read == -1)
-			return (-1);
-		if (nb_ligne == 0 && buff_read == 0)
-		{
-			line[0] = ft_strdup(tab_line[fd]);
-			free(tab_line[fd]);
-			tab_line[fd] = NULL;
-			flag = 1;
-		}
-		if (nb_ligne > 0 && flag == 0)
-		{
-			line[0] = ft_strsub(tab_line[fd], i, nb_ligne);
-			tmp = ft_strsub(tab_line[fd], nb_ligne + i, ft_strlen(tab_line[fd]));
-			free(tab_line[fd]);
-			tab_line[fd] = tmp;
-			flag = 1;
-		}
-		nb_ligne = ft_test_tab_line(tab_line[fd], &i);
 	}
-	if (buff_read == 0 && nb_ligne == -1)
-	{
-		tab_line[fd] = ft_strdup("");
-		return (0);
-	}
-	else if (buff_read > 0 || nb_ligne != 0)
-			return (1);
-	return (-1);
+		
+		
 }
 
 int	main(void)
