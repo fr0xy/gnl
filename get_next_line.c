@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rchoffar <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/11/27 05:32:50 by rchoffar          #+#    #+#             */
+/*   Updated: 2016/11/27 06:55:14 by rchoffar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-int	ft_test_tab_line(char *str, int *i)
+int		ft_ttl(char *str, int *i)
 {
 	int	j;
 
@@ -8,107 +20,95 @@ int	ft_test_tab_line(char *str, int *i)
 	j = 0;
 	if (str != NULL)
 	{
-		while (str[*i] == '\n')
+		if (str[*i] == '\n')
 			*i = *i + 1;
 		while (str[*i + j] != '\0' && str[*i + j] != '\n')
 			j++;
-		if (str[*i + j] == '\n' && j != 0)
-			return (j);
+		if (str[*i + j] == '\n')
+			return (j + 1);
 		else if (j != 0)
 			return (0);
 	}
 	return (-1);
 }
 
-int	get_next_line(const int fd, char **line)
+int		lecture(const int fd, char **tmp, int i)
 {
-	static char	*tab_line[255];
-	char	buf[BUFF_SIZE + 1];
-	char	*tmp;
-	int	nb_ligne;
-	int	buff_read;
-	int	i;
-	int flag;
+	int		ret;
+	char	buff[BUFF_SIZE + 1];
+	int		nb_line;
+	char	*tamp;
 
-	flag = 0;
-	i = 0;
-	buff_read = 1;
-	if (fd < 0)
-		return (-1);
-	if (tab_line[fd] != NULL)
-		if (tab_line[fd][0] == '\0')
-		{
-			line[0] = NULL;
-			return (0);
-		}
-	nb_ligne = ft_test_tab_line(tab_line[fd], &i);
-	while ((nb_ligne <= 0 && buff_read != 0) || flag == 0)
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		if (nb_ligne <= 0)
+		buff[ret] = '\0';
+		nb_line = ft_ttl(tmp[0], &i);
+		if (nb_line >= 0)
 		{
-			while ((buff_read = read(fd, buf, BUFF_SIZE)) > 0 && nb_ligne <= 0)
-			{
-				buf[buff_read] = '\0';
-				if ((nb_ligne = ft_test_tab_line(tab_line[fd], &i)) == -1)
-					tab_line[fd] = ft_strdup(buf);
-				else if (nb_ligne == 0)
-				{
-					tmp = ft_strjoin(tab_line[fd], buf);
-					free(tab_line[fd]);
-					tab_line[fd] = ft_strdup(tmp);
-				}
-				if ((nb_ligne = ft_test_tab_line(tab_line[fd], &i)) > 0)
-					break;
-			}
+			tamp = ft_strdup(tmp[0]);
+			free(tmp[0]);
+			tmp[0] = ft_strjoin(tamp, buff);
+			free(tamp);
 		}
-		if (buff_read == -1)
-			return (-1);
-		if (nb_ligne == 0 && buff_read == 0)
-		{
-			line[0] = ft_strdup(tab_line[fd]);
-			free(tab_line[fd]);
-			tab_line[fd] = NULL;
-			flag = 1;
-		}
-		if (nb_ligne > 0 && flag == 0)
-		{
-			line[0] = ft_strsub(tab_line[fd], i, nb_ligne);
-			tmp = ft_strsub(tab_line[fd], nb_ligne + i, ft_strlen(tab_line[fd]));
-			free(tab_line[fd]);
-			tab_line[fd] = tmp;
-			flag = 1;
-		}
-		nb_ligne = ft_test_tab_line(tab_line[fd], &i);
+		else
+			tmp[0] = ft_strdup(buff);
+		if (nb_line > 0)
+			return (-2);
 	}
-	if (buff_read == 0 && nb_ligne == -1)
-	{
-		tab_line[fd] = ft_strdup("");
-		return (0);
-	}
-	else if (buff_read > 0 || nb_ligne != 0)
-			return (1);
-	return (-1);
+	return (ret);
 }
 
-int	main(void)
+char	*set_line(char **str)
 {
-	char	*test;
-	int	fd;
-	int i;
+	char	*tmp;
+	char	*line;
+	int		nb_line;
+	int		i;
 
-	i = 0;
-	fd = 0;
-	if ((fd = open("one_big_fat_line.txt", O_RDONLY)) != -1)
+	nb_line = ft_ttl(str[0], &i);
+	line = ft_strsub(str[0], i, nb_line - 1);
+	tmp = ft_strsub(str[0], nb_line + i - 1, ft_strlen(str[0]));
+	free(str[0]);
+	str[0] = ft_strdup(tmp);
+	free(tmp);
+	return (line);
+}
+
+char	*set_end(int *etat, char **str, int nb_line)
+{
+	char	*line;
+
+	*etat = 1;
+	line = ft_strsub(str[0], nb_line, ft_strlen(str[0]));
+	free(str[0]);
+	return (line);
+}
+
+int		get_next_line(const int fd, char **line)
+{
+	static t_tab	tab[255];
+	t_int			var;
+
+	var.i = 0;
+	var.ret = 1;
+	if ((fd == 0 || fd > 2) && tab[fd].etat == 0)
 	{
-		while (i != 2)
-		{
-			printf("%d\n", get_next_line(fd, &test));
-			printf("%s\n", test);
-			i++;
-		}
-		printf("%d\n", i);
+		while (var.ret > 0)
+			var.ret = lecture(fd, &tab[fd].str, var.i);
+		if ((var.nb_line = ft_ttl(tab[fd].str, &var.i)) == 0 && var.ret == 0)
+			line[0] = set_end(&tab[fd].etat, &tab[fd].str, var.nb_line + var.i);
+		else if (var.ret == -1 && tab[fd].etat == 0 && var.nb_line == -1)
+			return (-1);
+		else
+			line[0] = set_line(&tab[fd].str);
+		if (var.ret == 0 && (var.nb_line = ft_ttl(tab[fd].str, &var.i)) == -1)
+			tab[fd].etat = 1;
+		return (1);
 	}
-	else
-		printf("%s\n", "erreur ouverture");
-	return (0);
+	else if ((fd == 0 || fd > 2) && tab[fd].etat == 1)
+	{
+		line[0] = NULL;
+		return (0);
+	}
+	return (-1);
 }
