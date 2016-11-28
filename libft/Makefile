@@ -7,7 +7,7 @@ OFILES = ft_atoi.o ft_isupper.o ft_memmove.o ft_putstr.o ft_strdup.o ft_strmapi.
 all: $(NAME)
 
 $(NAME):
-	gcc $(CFLAGS) $(CFILES)
+	gcc $(CFLAGS) -I ./includes $(CFILES)
 	ar rc $(NAME) $(OFILES)
 	ranlib $(NAME)
 

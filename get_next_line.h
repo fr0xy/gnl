@@ -6,20 +6,20 @@
 /*   By: rchoffar <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/27 05:48:14 by rchoffar          #+#    #+#             */
-/*   Updated: 2016/11/27 06:42:37 by rchoffar         ###   ########.fr       */
+/*   Updated: 2016/11/28 22:40:33 by rchoffar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 
 # define GET_NEXT_LINE_H
-# define BUFF_SIZE 15
+# define BUFF_SIZE 4
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
-# include "./libft/libft.h"
+# include "libft.h"
 
 typedef struct	s_tab
 {
