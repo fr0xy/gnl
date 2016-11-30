@@ -6,7 +6,7 @@
 /*   By: rchoffar <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/27 05:32:50 by rchoffar          #+#    #+#             */
-/*   Updated: 2016/11/28 22:40:04 by rchoffar         ###   ########.fr       */
+/*   Updated: 2016/11/30 16:08:41 by rchoffar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,26 +89,26 @@ void	set_end(int *etat, char **str, char **line, int nb_line)
 
 int		get_next_line(const int fd, char **line)
 {
-	static t_tab	tab[5000];
+	static t_tab	tab;
 	t_int			var;
 
 	var.ret = 1;
-	if ((fd == 0 || fd > 2) && tab[fd].etat == 0)
+	if ((fd == 0 || fd > 2) && tab.etat == 0)
 	{
 		while (var.ret > 0)
-			var.ret = lecture(fd, &tab[fd].str, var.i);
-		if (var.ret <= 0 && tab[fd].etat == 0 && (var.nb_line =
-					ft_ttl(tab[fd].str, &var.i)) == -1 && tab[fd].str == NULL)
+			var.ret = lecture(fd, &tab.str, var.i);
+		if (var.ret <= 0 && tab.etat == 0 && (var.nb_line =
+					ft_ttl(tab.str, &var.i)) == -1 && tab.str == NULL)
 			return (var.ret);
-		if ((var.nb_line = ft_ttl(tab[fd].str, &var.i)) <= 0 && var.ret == 0)
-			set_end(&tab[fd].etat, &tab[fd].str, &line[0], var.nb_line + var.i);
-		else if (tab[fd].etat == 0)
-			line[0] = set_line(&tab[fd].str);
-		if (var.ret == 0 && (var.nb_line = ft_ttl(tab[fd].str, &var.i)) == -1)
-			tab[fd].etat = 1;
+		if ((var.nb_line = ft_ttl(tab.str, &var.i)) <= 0 && var.ret == 0)
+			set_end(&tab.etat, &tab.str, &line[0], var.nb_line + var.i);
+		else if (tab.etat == 0)
+			line[0] = set_line(&tab.str);
+		if (var.ret == 0 && (var.nb_line = ft_ttl(tab.str, &var.i)) == -1)
+			tab.etat = 1;
 		return (1);
 	}
-	else if ((fd == 0 || fd > 2) && tab[fd].etat == 1)
+	else if ((fd == 0 || fd > 2) && tab.etat == 1)
 	{
 		line[0] = NULL;
 		return (0);
